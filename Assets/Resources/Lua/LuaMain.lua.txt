@@ -1,0 +1,6 @@
+--require("Assets/Lua/HelloLua")
+require("Lua/TextManager")
+require("Lua/EnemyManager")
+require("Lua/BulletsManager")
+require("Lua/Main")
+require("Lua/PlayerContorl")

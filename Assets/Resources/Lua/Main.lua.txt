@@ -1,0 +1,158 @@
+Game = {Time = 0, Kill = 0, Canvas = nil, PlayerShipGo = nil}
+
+function Start()
+    Game.Canvas = CS.UnityEngine.GameObject.Find("Canvas")
+    Game.PlayerShipGo = CS.UnityEngine.GameObject.Find("PlayerShip")
+    TextManager:Start()
+    EnemyManager:Start()
+    BulletsManager:Start()
+    PlayerContorl:Start()
+end
+
+function Updata()
+    print("Updata")
+    TextManager:Updata()
+    EnemyManager:Updata()
+    BulletsManager:Updata()
+    PlayerContorl:Updata()
+
+    BulletsManager.SettingHp = Game.Kill + 1
+    EnemyManager.SettingHp = 2 + math.floor(Game.Time / 3)
+
+    --local go = CS.UnityEngine.GameObject.Find("Enemy")
+    --GoMove(go, 150, Dirction.down)
+end
+
+--CS.UnityEngine.GameObject.Instantiate(CS.UnityEngine.Resources.Load("GameObject"))
+
+Dirction = {
+    up = {x = 0, y = 1},
+    down = {x = 0, y = -1},
+    left = {x = -1, y = 0},
+    right = {x = 1, y = 0}
+}
+
+function GoMove(go, speed, direction)
+    --print(speed * CS.UnityEngine.Time.deltaTime * direction.y)
+    local pos = {x = 0, y = 0, z = 0}
+    pos.x = speed * CS.UnityEngine.Time.deltaTime * direction.x
+    pos.y = speed * CS.UnityEngine.Time.deltaTime * direction.y
+    go.transform:Translate(pos.x, pos.y, pos.z)
+end
+
+function CreateGameobject(go, parent, position)
+    local newgo = CS.UnityEngine.GameObject.Instantiate(go)
+    newgo.transform.position = position
+    newgo.transform:SetParent(parent, false)
+    return newgo
+end
+
+function OnTriggerEnter(go, otherGo)
+    if (otherGo.name == "PlayerShip") then
+        print("GG")
+        GameOver()
+    end
+
+    local th = GetUnitInTable(go, EnemyManager.EnemyList)
+    local oth = GetUnitInTable(otherGo, BulletsManager.BulletsList)
+
+    if th == nil then
+        print("th==nil")
+        return
+    end
+
+    if oth == nil then
+        print("oth==nil")
+        return
+    end
+
+    if (th.Hp == oth.Hp) then
+        Game.Kill = Game.Kill + 1
+        TextManager:SetKillText(Game.Kill)
+        RemoveUnitInGoListAndList(oth.Go, BulletsManager.BulletsGoList, BulletsManager.BulletsList)
+        RemoveUnitInGoListAndList(th.Go, EnemyManager.EnemyGoList, EnemyManager.EnemyList)
+        CS.UnityEngine.GameObject.Destroy(th.Go)
+        CS.UnityEngine.GameObject.Destroy(oth.Go)
+        th = nil
+        oth = nil
+        return
+    end
+
+    if (th.Hp > oth.Hp) then
+        RemoveUnitInGoListAndList(oth.Go, BulletsManager.BulletsGoList, BulletsManager.BulletsList)
+        th:SetHp(th.Hp - oth.Hp)
+        CS.UnityEngine.GameObject.Destroy(oth.Go)
+        oth = nil
+        return
+    end
+
+    if (th.Hp < oth.Hp) then
+        Game.Kill = Game.Kill + 1
+        TextManager:SetKillText(Game.Kill)
+        RemoveUnitInGoListAndList(th.Go, EnemyManager.EnemyGoList, EnemyManager.EnemyList)
+        oth:SetHp(oth.Hp - th.Hp)
+        CS.UnityEngine.GameObject.Destroy(th.Go)
+        th = nil
+        return
+    end
+    -- body
+end
+
+function GetUnitInTable(go, list)
+    for i, v in ipairs(list) do
+        if go == v.Go then
+            return v
+        end
+    end
+    return nil
+end
+
+function RemoveUnitInGoListAndList(go, listGo, list)
+    for i, v in ipairs(listGo) do
+        if go == v then
+            table.remove(listGo, i)
+        end
+    end
+
+    for i, v in ipairs(list) do
+        if go == v.Go then
+            table.remove(list, i)
+        end
+    end
+end
+
+function GameOver()
+    for i, v in ipairs(EnemyManager.EnemyGoList) do
+        CS.UnityEngine.GameObject.Destroy(v)
+    end
+
+    for i, v in ipairs(BulletsManager.BulletsGoList) do
+        CS.UnityEngine.GameObject.Destroy(v)
+    end
+
+    EnemyManager.EnemyGoList = {}
+    EnemyManager.EnemyList = {}
+    BulletsManager.BulletsGoList = {}
+    BulletsManager.BulletsList = {}
+
+    Game.Time = 0
+    Game.Kill = 0
+end
+
+Unit = {Go, TextCom, Hp}
+
+function Unit:new(Go, Hp)
+    unit = {}
+    setmetatable(unit, self)
+    self.__index = self
+    unit.Go = Go
+
+    unit.TextCom = Go.transform:Find("Text").gameObject:GetComponent("Text")
+    unit:SetHp(Hp)
+    return unit
+end
+
+function Unit.SetHp(self, value)
+    self.Hp = value
+    self.TextCom.text = value
+end

@@ -1,0 +1,21 @@
+LuaInt = 100
+print("Hello World")
+Lclass = {Name = "Jack", isFamle = false}
+Lclass.Age = 10
+
+function Lclass:PringName()
+    print(self.Name)
+end
+
+function TestAction(a, b)
+    print("a=" .. a)
+    print("b=" .. b)
+    return a + 100, b + 200
+end
+
+function LuaAction(a, b)
+    print("a=" .. a)
+    print("b=" .. b)
+    return a + 100, b + 200
+end
+

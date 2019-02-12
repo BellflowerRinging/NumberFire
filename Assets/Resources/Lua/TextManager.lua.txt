@@ -1,0 +1,30 @@
+TextManager = {
+    KillTextCom = nil,
+    TimeTextGoCom = nil,
+    time = 0
+}
+
+function TextManager:Start()
+    self.KillTextGoCom = CS.UnityEngine.GameObject.Find("KillTextGo"):GetComponent("Text")
+    self.TimeTextGoCom = CS.UnityEngine.GameObject.Find("TimeTextGo"):GetComponent("Text")
+    self.KillTextGoCom.text = "击杀：0"
+end
+
+function TextManager:Updata()
+    self.time = self.time + CS.UnityEngine.Time.deltaTime
+    if self.time >= 1 then
+        self.time = self.time - 1
+        Game.Time = Game.Time + 1
+        self.TimeTextGoCom.text = "时间：" .. Game.Time
+    end
+end
+
+function TextManager:Reset()
+    self.time = 0
+    Game.Time = 0
+    Game.Kill = 0
+end
+
+function TextManager:SetKillText(value)
+    self.KillTextGoCom.text = "击杀：" .. value
+end

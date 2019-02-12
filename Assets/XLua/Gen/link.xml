@@ -1,0 +1,11 @@
+﻿
+
+<linker>
+
+	<assembly fullname="UnityEngine.CoreModule">
+	    <type fullname="UnityEngine.GameObject" preserve="all"/>
+		<type fullname="UnityEngine.Transform" preserve="all"/>
+		
+	</assembly>
+
+</linker>

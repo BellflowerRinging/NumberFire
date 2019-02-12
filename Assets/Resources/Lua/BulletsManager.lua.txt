@@ -1,0 +1,51 @@
+BulletsManager = {
+    BulletsGo = nil,
+    BulletsGoList = {},
+    BulletsList = {},
+    ii = 0,
+    SettingHp = 1,
+    SettingMoveSpeed = 300,
+    CreateSpaceTime = 2,
+    CreatePositionOffsetY = 130,
+    DestoryPositionMaxY = 1920,
+    BullterId = 0
+}
+
+function BulletsManager:Start()
+    self.BulletsGo = CS.UnityEngine.Resources.Load("Bullets")
+end
+
+function BulletsManager:Updata()
+    if Game.Time % self.CreateSpaceTime == 0 and self.ii == 0 then
+        self.ii = -1
+        local go =
+            CreateGameobject(
+            BulletsManager.BulletsGo,
+            Game.Canvas.transform,
+            {
+                x = Game.PlayerShipGo.transform.localPosition.x,
+                y = Game.PlayerShipGo.transform.localPosition.y + self.CreatePositionOffsetY,
+                z = 0
+            }
+        )
+        local bullet = Unit:new(go, self.SettingHp)
+        bullet.Go.name = bullet.Go.name .. self.BullterId
+        self.BullterId = self.BullterId + 1
+
+        table.insert(self.BulletsList, bullet)
+        table.insert(self.BulletsGoList, go)
+    else
+        if Game.Time % self.CreateSpaceTime ~= 0 then
+            self.ii = 0
+        end
+    end
+
+    for i, bullet in ipairs(self.BulletsGoList) do
+        if bullet.transform.position.y > self.DestoryPositionMaxY then
+            CS.UnityEngine.GameObject.Destroy(bullet)
+            table.remove(self.BulletsGoList, i)
+            table.remove(self.BulletsList, i)
+        end
+        GoMove(bullet, self.SettingMoveSpeed, Dirction.up)
+    end
+end

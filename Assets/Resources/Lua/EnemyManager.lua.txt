@@ -1,0 +1,47 @@
+EnemyManager = {
+    EnemyGo = nil,
+    EnemyGoList = {},
+    EnemyList = {},
+    ii = 0,
+    SettingHp = 2,
+    SettingMoveSpeed = 200,
+    CreateSpaceTime = 1.5,
+    CreatePositionY = 1022.5,
+    CreatePositionMinX = -477,
+    CreatePositionMaxX = 477,
+    DestoryPositionMinY = -125,
+    BullterId = 0
+}
+
+function EnemyManager:Start()
+    self.EnemyGo = CS.UnityEngine.Resources.Load("Enemy")
+end
+
+function EnemyManager:Updata()
+    self.ii = self.ii + CS.UnityEngine.Time.deltaTime
+    if self.ii > 1 then
+        self.ii = self.ii - 1
+        local go =
+            CreateGameobject(
+            EnemyManager.EnemyGo,
+            Game.Canvas.transform,
+            {x = math.random(self.CreatePositionMinX, self.CreatePositionMaxX), y = self.CreatePositionY, z = 0}
+        )
+
+        local enemy = Unit:new(go, self.SettingHp)
+        enemy.Go.name = enemy.Go.name .. self.BullterId
+        self.BullterId = self.BullterId + 1
+
+        table.insert(self.EnemyList, enemy)
+        table.insert(self.EnemyGoList, go)
+    end
+
+    for i, enemy in ipairs(self.EnemyGoList) do
+        if enemy.transform.position.y < self.DestoryPositionMinY then
+            CS.UnityEngine.GameObject.Destroy(enemy)
+            table.remove(self.EnemyGoList, i)
+            table.remove(self.EnemyList, i)
+        end
+        GoMove(enemy, self.SettingMoveSpeed, Dirction.down)
+    end
+end

@@ -1,0 +1,24 @@
+PlayerContorl = {PlayerShipGo = nil}
+
+function PlayerContorl:Start()
+    self.PlayerShipGo = Game.PlayerShipGo
+end
+
+function PlayerContorl:Updata()
+    if
+        ((CS.UnityEngine.Input.touchCount >= 1 and CS.UnityEngine.Input.touches[0].position.x < 540) or
+            (CS.UnityEngine.Input.mousePosition.x < 540 and CS.UnityEngine.Input.GetMouseButton(0)) or
+            CS.UnityEngine.Input.GetKey("a")) and
+            self.PlayerShipGo.transform.localPosition.x > -390
+     then
+        GoMove(self.PlayerShipGo, 200, Dirction.left)
+    end
+    if
+        ((CS.UnityEngine.Input.touchCount >= 1 and CS.UnityEngine.Input.touches[0].position.x > 540) or
+            (CS.UnityEngine.Input.mousePosition.x > 540 and CS.UnityEngine.Input.GetMouseButton(0)) or
+            CS.UnityEngine.Input.GetKey("d")) and
+            self.PlayerShipGo.transform.localPosition.x < 390
+     then
+        GoMove(self.PlayerShipGo, 200, Dirction.right)
+    end
+end
